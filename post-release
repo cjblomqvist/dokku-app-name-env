@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+
+APP="$1"; IMAGE="dokku/$APP";
+
+# Push the GIT_REV to the docker image
+id=$(echo "export APP=$APP" | docker run -i -a stdin $IMAGE /bin/bash -c "cat > /app/.profile.d/app_name_env.sh")
+test $(docker wait $id) -eq 0
+docker commit $id $IMAGE > /dev/null
